@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Playnite.SDK;
+using Playnite.SDK.Plugins;
+using StoreSpoofer.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using Playnite.SDK;
-using Playnite.SDK.Plugins;
-using StoreSpoofer.Extensions;
 
 namespace StoreSpoofer
 {
-    public class StoreSpooferPlugin : Plugin
+    public class StoreSpooferPlugin : GenericPlugin
     {
         private ILogger _logger;
         private readonly IPlayniteAPI _api;
@@ -23,14 +22,14 @@ namespace StoreSpoofer
         public StoreSpooferPlugin(IPlayniteAPI api) : base(api)
         {
             _api = api;
-            _logger = api.CreateLogger();
+            _logger = LogManager.GetLogger();
         }
 
-        public override IEnumerable<ExtensionFunction> GetFunctions()
+        public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
-            return new List<ExtensionFunction>
+            return new List<GameMenuItem>
             {
-                new ExtensionFunction("Change Game Id of the Selected Game", () =>
+                new GameMenuItem(){MenuSection = "StoreSpoofer", Description = "Change Game Id of the Selected Game", Action = (gameMenuItem) =>
                 {
                     var count = _api.MainView.SelectedGames.Count();
 
@@ -47,7 +46,7 @@ namespace StoreSpoofer
                             {
                                 _gameGuidToOldGameId[game.Id] = game.GameId;
                             }
-                            
+
                             _api.Database.Games.Single(x =>
                             {
                                 if (x.Id != game.Id)
@@ -68,8 +67,8 @@ namespace StoreSpoofer
                     {
                         _api.Dialogs.ShowErrorMessage("Please select a Game.", "No Game selected.");
                     }
-                }),
-                new ExtensionFunction("Restore Game Id of the Selected Game(s)", () =>
+                } },
+                new GameMenuItem(){MenuSection = "StoreSpoofer", Description = "Restore Game Id of the Selected Game(s)", Action = (gameMenuItem) =>
                 {
                     if (!_api.MainView.SelectedGames.Any())
                     {
@@ -84,8 +83,8 @@ namespace StoreSpoofer
                             game.GameId = _gameGuidToOldGameId[game.Id];
                         }
                     }
-                }),
-                new ExtensionFunction("Change Library Plugin of the Selected Game(s)", () =>
+                } },
+                new GameMenuItem(){MenuSection = "StoreSpoofer", Description = "Change Library Plugin of the Selected Game(s)", Action = (gameMenuItem) =>
                 {
                     if (!_api.MainView.SelectedGames.Any())
                     {
@@ -132,8 +131,8 @@ namespace StoreSpoofer
 
                         game.PluginId = userResult.ToGuid();
                     }
-                }),
-                new ExtensionFunction("Restore Library Plugin of the Selected Game(s)", () =>
+                } },
+                new GameMenuItem(){MenuSection = "StoreSpoofer", Description = "Restore Library Plugin of the Selected Game(s)", Action = (gameMenuItem) =>
                 {
                     if (!_api.MainView.SelectedGames.Any())
                     {
@@ -148,8 +147,8 @@ namespace StoreSpoofer
                             game.PluginId = _gameGuidToOldLibraryGuid[game.Id];
                         }
                     }
-                }),
-                new ExtensionFunction("Auto-match GameId and Library Plugin for the Selected Game(s)", () =>
+                } },
+                new GameMenuItem(){MenuSection = "StoreSpoofer", Description = "Auto-match GameId and Library Plugin for the Selected Game(s)", Action = (gameMenuItem) =>
                 {
                     if (!_api.MainView.SelectedGames.Any())
                     {
@@ -166,17 +165,17 @@ namespace StoreSpoofer
                         {
                             game.GameId = matches[0].GameId;
                             game.PluginId = matches[0].Plugin.ToGuid();
-                            
+
                             if (!_gameGuidToOldLibraryGuid.ContainsKey(game.Id))
                             {
                                 _gameGuidToOldLibraryGuid[game.Id] = game.PluginId;
                             }
-                            
+
                             if (!_gameGuidToOldGameId.ContainsKey(game.Id))
                             {
                                 _gameGuidToOldGameId[game.Id] = game.GameId;
                             }
-                            
+
                             count++;
                         }
                         else if (matches.Count > 1)
@@ -185,7 +184,7 @@ namespace StoreSpoofer
                             messageBoxTextBuilder.Append("Choose library for this game:");
                             messageBoxTextBuilder.Append(string.Join(", ", matches.Select(x => x.Plugin.EnumGetDescription()).ToArray()));
                             messageBoxTextBuilder.Append(".");
-                            
+
                             showDialog2:
                             var enterGameIdDialogResult = _api.Dialogs.SelectString(messageBoxTextBuilder.ToString(),
                                 game.Name, matches[0].Plugin.EnumGetDescription());
@@ -194,9 +193,9 @@ namespace StoreSpoofer
                             {
                                 continue;
                             }
-                            
+
                             GameLibrary userResult;
-                            
+
                             var selectedString = enterGameIdDialogResult.SelectedString;
 
                             if (!selectedString.EnumFromDescription(out userResult) && !Enum.TryParse(selectedString, true, out userResult))
@@ -221,7 +220,7 @@ namespace StoreSpoofer
                             {
                                 _gameGuidToOldLibraryGuid[game.Id] = game.PluginId;
                             }
-                            
+
                             if (!_gameGuidToOldGameId.ContainsKey(game.Id))
                             {
                                 _gameGuidToOldGameId[game.Id] = game.GameId;
@@ -236,12 +235,12 @@ namespace StoreSpoofer
                             _api.Notifications.Add("StoreSpooferAutoFailed", $"Auto matching failed for \'{game.Name}\'.", NotificationType.Error);
                         }
                     }
-                    
+
                     if (count > 0)
                     {
                         _api.Notifications.Add("StoreSpooferAutoSuccess", $"Successfully matched {count} game(s)!", NotificationType.Info);
                     }
-                })
+                } }
             };
         }
     }

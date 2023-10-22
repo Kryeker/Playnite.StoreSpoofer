@@ -8,33 +8,36 @@ namespace StoreSpoofer
     {
         [Description("None (Playnite)")]
         None,
-        
+
         [Description("Battle.net")]
         BattleNet,
-        
+
         [Description("Bethesda")]
         Bethesda,
-        
+
         [Description("Epic")]
         Epic,
-        
+
         [Description("GOG")]
         Gog,
-        
+
         [Description("itch.io")]
         Itchio,
-        
+
         [Description("Origin")]
-        Origin, 
-        
+        Origin,
+
         [Description("Steam")]
         Steam,
-        
+
         [Description("Twitch")]
         Twitch,
-        
+
         [Description("Uplay")]
         Uplay,
+
+        [Description("Playstation")]
+        Playstation
     }
 
     public static class AvailablePlugins
@@ -48,7 +51,8 @@ namespace StoreSpoofer
         private const string SteamGuid = "CB91DFC9-B977-43BF-8E70-55F46E410FAB";
         private const string TwitchGuid = "E2A7D494-C138-489D-BB3F-1D786BEEB675";
         private const string UplayGuid = "C2F038E5-8B92-4877-91F1-DA9094155FC5";
-        
+        private const string PlaystationGuid = "e4ac81cb-1b1a-4ec9-8639-9a9633989a71";
+
         public static readonly Dictionary<GameLibrary, Guid> LibraryToGuid = new Dictionary<GameLibrary, Guid>
         {
             [GameLibrary.None] = Guid.Empty,
@@ -60,7 +64,8 @@ namespace StoreSpoofer
             [GameLibrary.Origin] = Guid.Parse(OriginGuid),
             [GameLibrary.Steam] = Guid.Parse(SteamGuid),
             [GameLibrary.Twitch] = Guid.Parse(TwitchGuid),
-            [GameLibrary.Uplay] = Guid.Parse(UplayGuid)
+            [GameLibrary.Uplay] = Guid.Parse(UplayGuid),
+            [GameLibrary.Playstation] = Guid.Parse(PlaystationGuid),
         };
 
         public static readonly Dictionary<Guid, GameLibrary> GuidToLibrary = new Dictionary<Guid, GameLibrary>
@@ -74,7 +79,8 @@ namespace StoreSpoofer
             [Guid.Parse(OriginGuid)] = GameLibrary.Origin,
             [Guid.Parse(SteamGuid)] = GameLibrary.Steam,
             [Guid.Parse(TwitchGuid)] = GameLibrary.Twitch,
-            [Guid.Parse(UplayGuid)] = GameLibrary.Uplay
+            [Guid.Parse(UplayGuid)] = GameLibrary.Uplay,
+            [Guid.Parse(PlaystationGuid)] = GameLibrary.Playstation,
         };
     }
 }

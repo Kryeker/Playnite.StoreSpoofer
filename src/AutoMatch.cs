@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Playnite.SDK.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using BattleNetLibrary;
-using BattleNetLibrary.Models;
-using Newtonsoft.Json;
-using Playnite.SDK.Models;
 
 namespace StoreSpoofer
 {
@@ -33,10 +31,10 @@ namespace StoreSpoofer
                 result.Add(findResult.Value);
 
             findResult = await TryFindGog(game);
-            
+
             if (findResult.HasValue)
                 result.Add(findResult.Value);
-            
+
             findResult = await TryFindBattleNet(game);
             
             if (findResult.HasValue)
@@ -114,7 +112,7 @@ namespace StoreSpoofer
                     else if (reader.TokenType == JsonToken.String)
                     {
                         // TODO: fuzzy matching?
-                        if (SanitizedCompare(game.Name, (string) reader.Value))
+                        if (SanitizedCompare(game.Name, (string)reader.Value))
                         {
                             return new MatchResult
                             {
@@ -213,15 +211,19 @@ namespace StoreSpoofer
 
         private static async Task<MatchResult?> TryFindBattleNet(Game game)
         {
-            foreach (var bnetGame in BattleNetGames.Games)
+            foreach (var g in Playnite.SDK.API.Instance.Database.Games)
             {
-                if (SanitizedCompare(bnetGame.Name, game.Name))
+                if (g.PluginId == AvailablePlugins.LibraryToGuid[GameLibrary.BattleNet])
                 {
-                    return new MatchResult
+                    var bnetGame = game;
+                    if (SanitizedCompare(bnetGame.Name, game.Name))
                     {
-                        GameId = bnetGame.ProductId,
-                        Plugin = GameLibrary.BattleNet
-                    };
+                        return new MatchResult
+                        {
+                            GameId = bnetGame.GameId,
+                            Plugin = GameLibrary.BattleNet
+                        };
+                    }
                 }
             }
 

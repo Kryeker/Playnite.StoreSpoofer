@@ -377,3 +377,4 @@ MigrationBackup/
 !.vscode/launch.json
 !.vscode/extensions.json
 
+.vshistory/

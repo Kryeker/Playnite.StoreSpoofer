@@ -379,3 +379,4 @@ MigrationBackup/
 
 .vshistory/
 /builds
+/external/BattleNetLibrary.dll
